@@ -27,7 +27,7 @@ def upperfunc(newurl):
 
 
 if __name__ == "__main__":
-    url = "https://github.com/Textualize/rich/tree/master/benchmarks"
+    url = "https://github.com/Clutchnp/myvim/lua/core"
     a = urlmaker(url)
     upperfunc(a)
     print('done')
