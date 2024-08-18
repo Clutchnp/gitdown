@@ -1,10 +1,25 @@
 import requests
 import os 
 from urllib.request import urlretrieve
+import rich.progress 
 # expects a general url from github 
 # for eg https://github.com/Clutchnp/myvim/lua/core
+
+
 def makefile(download_url,rel,fullpath):
-    urlretrieve(download_url,os.path.relpath(fullpath,os.path.dirname(rel)))
+    # it maybe can get deprecated according to the documentation so creating a cutom implementation using requests 
+    #urlretrieve(download_url,os.path.relpath(fullpath,os.path.dirname(rel)))
+    r = requests.get(download_url,stream=True)
+    total = int(r.headers.get('content-length', 0)) # get content length http header and return 0 if not recieved)
+# Use Progress context manager
+    with rich.progress.Progress() as progress:
+        download_task = progress.add_task("Downloading....", total=total)
+        print ( total )
+        
+        with open(os.path.relpath(fullpath, os.path.dirname(rel)), 'wb') as f:
+            for received in r.iter_content(50000):  # Chunk size of 50000 bytes
+                f.write(received)
+                progress.update(download_task, advance=len(received))
 
 def createdir():
     pass
