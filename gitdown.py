@@ -21,17 +21,11 @@ def makefile(download_url,rel,fullpath):
                 f.write(received)
                 progress.update(download_task, advance=len(received))
 
-def createdir():
-    pass
-
 def  urlmaker(url):
     a=url.split('/')
     newurl = f'https://api.github.com/repos/{a[3]}/{a[4]}/contents/{'/'.join(a[7:])}'
-    os.mkdir(a[-1])
+    os.makedirs(a[-1], exist_ok = True)
     return newurl,'/'.join(a[7:])
-def innerfunc(object):
-    if object['type'] == 'dir':
-        urlmaker(object['html_url'])
 
 def upperfunc(newurl,rel):
     request = requests.get(newurl)
@@ -44,14 +38,10 @@ def upperfunc(newurl,rel):
         else :
           makefile(x["download_url"],rel,x['path'])
 
-
-if __name__ == "__main__":
+def main():
     url = "https://github.com/Clutchnp/myvim/tree/main/lua"
     a,rel= urlmaker(url)
     upperfunc(a,rel)
     print('done')
-    
-
-
-
-    
+if __name__ == "__main__":
+    main()
