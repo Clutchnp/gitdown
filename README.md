@@ -1,8 +1,8 @@
 # Installation 
 
-```git clone https://github.com/Clutchnp/gitdown.git```
-``` pip install -r requirements.txt```
-
+1. Clone it using ```git clone https://github.com/Clutchnp/gitdown.git```
+2. install dependencies using ` pip install -r requirements.txt`
+3. Enjoy
 # Usage 
 
 ```python3 gitdown.py {link}```
