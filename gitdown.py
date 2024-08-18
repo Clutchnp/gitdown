@@ -12,7 +12,7 @@ def makefile(download_url, rel, fullpath, progress, status):
 def urlmaker(url):
     a = url.split('/')
     newurl = f'https://api.github.com/repos/{a[3]}/{a[4]}/contents/{"/".join(a[7:])}'
-    os.makedirs([x for x in a if a][-1], exist_ok=True)
+    os.makedirs([x for x in a if x][-1], exist_ok=True)
     return newurl, '/'.join(a[7:])
 
 def get_size(newurl):
