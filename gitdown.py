@@ -1,7 +1,7 @@
 import requests
 import os
 import rich.progress
-
+import sys
 def makefile(download_url, rel, fullpath, progress, status):
     r = requests.get(download_url, stream=True)
     with open(os.path.relpath(fullpath, os.path.dirname(rel)), 'wb') as f:
@@ -12,7 +12,7 @@ def makefile(download_url, rel, fullpath, progress, status):
 def urlmaker(url):
     a = url.split('/')
     newurl = f'https://api.github.com/repos/{a[3]}/{a[4]}/contents/{"/".join(a[7:])}'
-    os.makedirs(a[-1], exist_ok=True)
+    os.makedirs([x for x in a if a][-1], exist_ok=True)
     return newurl, '/'.join(a[7:])
 
 def get_size(newurl):
@@ -44,12 +44,12 @@ def upperfunc(newurl, rel):
     innerfunc(newurl, rel, progress, status)
     progress.stop()
 
-def main():
-    url = "https://github.com/Clutchnp/myvim/tree/main/lua"
+def main(argv):
+    url = argv
     newurl, rel = urlmaker(url)
     upperfunc(newurl, rel)
     print('done')
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1])
 
