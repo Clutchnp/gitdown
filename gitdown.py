@@ -1,59 +1,55 @@
 import requests
-import os 
-#from urllib.request import urlretrieve
-import rich.progress 
-import pprint
-# expects a general url from github 
-# for eg https://github.com/Clutchnp/myvim/lua/core
+import os
+import rich.progress
 
-all_size = 0
-def makefile(download_url,rel,fullpath,size):
-    # it maybe can get deprecated according to the documentation so creating a cutom implementation using requests 
-    #urlretrieve(download_url,os.path.relpath(fullpath,os.path.dirname(rel)))
-    r = requests.get(download_url,stream=True)
-# Use Progress context manager
-    with rich.progress.Progress() as progress:
-        download_task = progress.add_task("Downloading....", total=all_size)
-        
-        with open(os.path.relpath(fullpath, os.path.dirname(rel)), 'wb') as f:
-            for received in r.iter_content(50000):  # Chunk size of 50000 bytes
-                f.write(received)
-                progress.advance(download_task, advance=size)
+def makefile(download_url, rel, fullpath, progress, status):
+    r = requests.get(download_url, stream=True)
+    with open(os.path.relpath(fullpath, os.path.dirname(rel)), 'wb') as f:
+        for received in r.iter_content(50000):  # Chunk size of 50000 bytes
+            f.write(received)
+            progress.update(status, advance=len(received))
 
-def  urlmaker(url):
-    a=url.split('/')
-    newurl = f'https://api.github.com/repos/{a[3]}/{a[4]}/contents/{'/'.join(a[7:])}'
-    os.makedirs(a[-1], exist_ok = True)
-    return newurl,'/'.join(a[7:])
+def urlmaker(url):
+    a = url.split('/')
+    newurl = f'https://api.github.com/repos/{a[3]}/{a[4]}/contents/{"/".join(a[7:])}'
+    os.makedirs(a[-1], exist_ok=True)
+    return newurl, '/'.join(a[7:])
 
 def get_size(newurl):
-    global all_size
+    total_size = 0
     request = requests.get(newurl)
     jsonresponse = request.json()
     for x in jsonresponse:
         if x['type'] == 'dir':
-            get_size(x['url'])
+            total_size += get_size(x['url'])
         else:
-            all_size+=x['size']
+            total_size += x['size']
+    return total_size
 
-def upperfunc(newurl,rel):
-    get_size(newurl) 
-    innerfunc(newurl, rel)
-  
-def innerfunc(newurl,rel):
+def innerfunc(newurl, rel, progress, status):
     request = requests.get(newurl)
     jsonresponse = request.json()
     for x in jsonresponse:
-            if x['type'] == 'dir':
-                os.makedirs(os.path.relpath(x['path'],os.path.dirname(rel)), exist_ok=True)
-                innerfunc(x['url'],rel)
-            else :
-                makefile(x["download_url"],rel,x['path'],x['size'])
+        if x['type'] == 'dir':
+            os.makedirs(os.path.relpath(x['path'], os.path.dirname(rel)), exist_ok=True)
+            innerfunc(x['url'], rel, progress, status)
+        else:
+            makefile(x["download_url"], rel, x['path'], progress, status)
+
+def upperfunc(newurl, rel):
+    total_size = get_size(newurl)
+    progress = rich.progress.Progress()
+    status = progress.add_task('Downloading', total=total_size)
+    progress.start()
+    innerfunc(newurl, rel, progress, status)
+    progress.stop()
 
 def main():
     url = "https://github.com/Clutchnp/myvim/tree/main/lua"
-    a,rel= urlmaker(url)
-    upperfunc(a,rel)
+    newurl, rel = urlmaker(url)
+    upperfunc(newurl, rel)
     print('done')
+
 if __name__ == "__main__":
     main()
+
