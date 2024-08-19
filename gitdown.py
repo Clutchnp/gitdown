@@ -2,6 +2,17 @@ import requests
 import os
 import rich.progress
 import sys
+import argparse
+
+def arghelper():
+    parser = argparse.ArgumentParser(description= "Download Github Directories from command line easily!!")
+    parser.add_argument('link', type=str, nargs='+', help = 'link of the html page of the directory to download (just copy it from the url bar, adding directory to https clone link wont work)')
+    if len(sys.argv)==1:
+        parser.print_help(sys.stderr)
+        sys.exit(1)
+    args = parser.parse_args()
+    return args 
+
 def makefile(download_url, rel, fullpath, progress, status):
     r = requests.get(download_url, stream=True)
     with open(os.path.relpath(fullpath, os.path.dirname(rel)), 'wb') as f:
@@ -44,12 +55,13 @@ def upperfunc(newurl, rel):
     innerfunc(newurl, rel, progress, status)
     progress.stop()
 
-def main(argv):
-    url = argv
+def main():
+    arg = arghelper()
+    url = arg  
     newurl, rel = urlmaker(url)
     upperfunc(newurl, rel)
     print('done')
-
+    
 if __name__ == "__main__":
-    main(sys.argv[1])
+    main()
 
