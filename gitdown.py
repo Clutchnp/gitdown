@@ -6,12 +6,12 @@ import argparse
 
 def arghelper():
     parser = argparse.ArgumentParser(description= "Download Github Directories from command line easily!!")
-    parser.add_argument('link', type=str, nargs='+', help = 'link of the html page of the directory to download (just copy it from the url bar, adding directory to https clone link wont work)')
-    if len(sys.argv)==1:
+    parser.add_argument('link', type=str, help='link of the HTML page of the directory to download (just copy it from the URL bar, adding directory to https clone link won’t work)')
+    if len(sys.argv) == 1:
         parser.print_help(sys.stderr)
         sys.exit(1)
     args = parser.parse_args()
-    return args 
+    return args.link  # Return the URL directly as a string
 
 def makefile(download_url, rel, fullpath, progress, status):
     r = requests.get(download_url, stream=True)
