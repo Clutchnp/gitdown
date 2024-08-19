@@ -11,7 +11,7 @@ def arghelper():
         parser.print_help(sys.stderr)
         sys.exit(1)
     args = parser.parse_args()
-    return args.link  # Return the URL directly as a string
+    return args.link  
 
 def makefile(download_url, rel, fullpath, progress, status):
     r = requests.get(download_url, stream=True)
