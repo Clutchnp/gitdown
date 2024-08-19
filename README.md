@@ -2,9 +2,11 @@ This tool allows users to download specific directories from github repositories
 
 # Installation 
 
-1. Clone it using ```git clone https://github.com/Clutchnp/gitdown.git```
-2. install dependencies using ` pip install -r requirements.txt`
-3. Enjoy
+1. Install python-virtualenv and pyinstaller as you see fit.
+    For arch-based systems  `yay -S pyinstaller python-virtualenv` (replace with appropriate aur helper)
+2. Clone the repo using ```git clone https://github.com/Clutchnp/gitdown.git```
+3. install dependencies using ` pip install -r requirements.txt`
+4. Enjoy
 # Usage 
 
 ```python3 gitdown.py {link}```
