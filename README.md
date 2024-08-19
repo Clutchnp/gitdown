@@ -1,3 +1,5 @@
+This tool allows users to download specific directories from github repositories using the cli easily 
+
 # Installation 
 
 1. Clone it using ```git clone https://github.com/Clutchnp/gitdown.git```
