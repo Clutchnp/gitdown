@@ -12,6 +12,6 @@ This tool allows users to download specific directories from github repositories
 
 # Tips 
 
-1. convert the python file to binary and place it in path
+1. convert the python file to binary and place it in path (script coming)
 2. then u will able to call it from cli like `gitdown {link}`
 
