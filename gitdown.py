@@ -6,12 +6,14 @@ import argparse
 
 def arghelper():
     parser = argparse.ArgumentParser(description= "Download Github Directories from command line easily!!")
-    parser.add_argument('link', type=str, help='link of the HTML page of the directory to download (just copy it from the URL bar, adding directory to https clone link won’t work)')
+    parser.add_argument('[link]', type=str,help='link of the HTML page of the directory to download (just copy it from the URL bar, adding directory to https clone link won’t work)')
+    parser.add_argument('[newname]', type=str,nargs='?',help='lets you specify the name of folder being downloaded')
     if len(sys.argv) == 1:
         parser.print_help(sys.stderr)
         sys.exit(1)
     args = parser.parse_args()
-    return args.link  
+    print(vars(args))
+    return vars(args)  
 
 def makefile(download_url, rel, fullpath, progress, status):
     r = requests.get(download_url, stream=True)
@@ -23,8 +25,9 @@ def makefile(download_url, rel, fullpath, progress, status):
 def urlmaker(url):
     a = url.split('/')
     newurl = f'https://api.github.com/repos/{a[3]}/{a[4]}/contents/{"/".join(a[7:])}'
-    os.makedirs([x for x in a if x][-1], exist_ok=True)
-    return newurl, '/'.join(a[7:])
+    name = [x for x in a if x][-1]
+    os.makedirs(name, exist_ok=True)
+    return newurl, '/'.join(a[7:]), name
 
 def get_size(newurl):
     total_size = 0
@@ -55,11 +58,16 @@ def upperfunc(newurl, rel):
     innerfunc(newurl, rel, progress, status)
     progress.stop()
 
+def rename(orignal_name,new_name): 
+    os.rename(orignal_name,new_name)
+
 def main():
     arg = arghelper()
-    url = arg  
-    newurl, rel = urlmaker(url)
+    url = arg['[link]']
+    newurl, rel, orignal_name = urlmaker(url)
     upperfunc(newurl, rel)
+    if arg['[newname]'] :
+        rename(orignal_name,arg['[newname]'])
     print('done')
     
 if __name__ == "__main__":
