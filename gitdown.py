@@ -12,7 +12,6 @@ def arghelper():
         parser.print_help(sys.stderr)
         sys.exit(1)
     args = parser.parse_args()
-    print(vars(args))
     return vars(args)  
 
 def makefile(download_url, rel, fullpath, progress, status):
