@@ -1,5 +1,10 @@
 This tool allows users to download specific directories from github repositories using the cli easily 
 
+
+> [!Big Change]
+> the commit #932a6b introduces a new way to handle api requests
+> before no. of api requests were depandant on the directories traversed("because of recursion and chances of hitting rate limit were higher")
+> This changed in this commit which now uses only 2 api requests for non truncated github responeses. Truncated responses(seen in largo repos) are still wip 
 # Installation 
 ## For Linux Systems:
 
