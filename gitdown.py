@@ -1,3 +1,4 @@
+import json
 import requests
 import os
 import rich.progress
@@ -6,69 +7,67 @@ import argparse
 
 def arghelper():
     parser = argparse.ArgumentParser(description= "Download Github Directories from command line easily!!")
-    parser.add_argument('[link]', type=str,help='link of the HTML page of the directory to download (just copy it from the URL bar, adding directory to https clone link won’t work)')
-    parser.add_argument('[newname]', type=str,nargs='?',help='lets you specify the name of folder being downloaded')
+    parser.add_argument('link', type=str,help='link of the HTML page of the directory to download (just copy it from the URL bar, adding directory to https clone link won’t work)')
+    parser.add_argument('newname', type=str,nargs='?',help='lets you specify the name of folder being downloaded')
     if len(sys.argv) == 1:
         parser.print_help(sys.stderr)
         sys.exit(1)
     args = parser.parse_args()
     return vars(args)  
 
-def makefile(download_url, rel, fullpath, progress, status):
-    r = requests.get(download_url, stream=True)
-    with open(os.path.relpath(fullpath, os.path.dirname(rel)), 'wb') as f:
-        for received in r.iter_content(50000):  # Chunk size of 50000 bytes
-            f.write(received)
-            progress.update(status, advance=len(received))
+def responder(url): 
+    piece = url.split("/")
+    repo = piece[3]+"/"+piece[4]
+    newurl = f"https://api.github.com/repos/{repo}/git/trees/{piece[6]}?recursive=1"
+    jsonresponse = requests.get(newurl).json() # Not handling truncated responeses yet but will in future
+    name = [x for x in piece if x][-1]
+    path = ''.join(piece[7:])
+    return jsonresponse,repo,path,piece[6],name
+def get_size(json):
+    size = 0 
+    for x in json['tree']: 
+        if x["type"]=="blob":
+          size+=x['size']
+    return size 
 
-def urlmaker(url):
-    a = url.split('/')
-    newurl = f'https://api.github.com/repos/{a[3]}/{a[4]}/contents/{"/".join(a[7:])}'
-    name = [x for x in a if x][-1]
-    os.makedirs(name, exist_ok=True)
-    return newurl, '/'.join(a[7:]), name
+def thejsonresponse(response,path):
+     for x in response['tree']:
+        if x['path'] == path:
+            jsonresponse = requests.get(x["url"]+"?recursive=1").json() 
+            return jsonresponse
 
-def get_size(newurl):
-    total_size = 0
-    request = requests.get(newurl)
-    jsonresponse = request.json()
-    for x in jsonresponse:
-        if x['type'] == 'dir':
-            total_size += get_size(x['url'])
         else:
-            total_size += x['size']
-    return total_size
+            continue
+def create_dir(path):
+    if path:
+        os.makedirs(path,exist_ok=True)
 
-def innerfunc(newurl, rel, progress, status):
-    request = requests.get(newurl)
-    jsonresponse = request.json()
-    for x in jsonresponse:
-        if x['type'] == 'dir':
-            os.makedirs(os.path.relpath(x['path'], os.path.dirname(rel)), exist_ok=True)
-            innerfunc(x['url'], rel, progress, status)
-        else:
-            makefile(x["download_url"], rel, x['path'], progress, status)
-
-def upperfunc(newurl, rel):
-    total_size = get_size(newurl)
-    progress = rich.progress.Progress()
-    status = progress.add_task('Downloading', total=total_size)
-    progress.start()
-    innerfunc(newurl, rel, progress, status)
-    progress.stop()
-
-def rename(orignal_name,new_name): 
-    os.rename(orignal_name,new_name)
+def downplace(json,repo,branch,name,newname,progress,status):
+    for x in json["tree"]: 
+        if x["type"]=="blob":
+         download_url=f"https://raw.githubusercontent.com/{repo}/{branch}/{name}/{x["path"]}"
+         file = x["path"]
+         r = requests.get(download_url, stream=True)
+         create_dir(newname + os.path.dirname(file))
+         with open(newname + file, "wb") as f:
+              for received in r.iter_content(50000):  # Chunk size of 50000 bytes
+                f.write(received)
+                progress.update(status, advance=len(received))
 
 def main():
     arg = arghelper()
-    url = arg['[link]']
-    newurl, rel, orignal_name = urlmaker(url)
-    upperfunc(newurl, rel)
-    if arg['[newname]'] :
-        rename(orignal_name,arg['[newname]'])
-    print('done')
-    
+    url = arg['link']
+    response,repo,path,branch,name = responder(url)
+    thejson = thejsonresponse(response,path) 
+    size = get_size(thejson)
+    progress = rich.progress.Progress()
+    status = progress.add_task('Downloading', total=size)
+    progress.start()
+    if arg['newname'] :
+        downplace(thejson,repo,branch,name,arg["newname"]+"/",progress,status)
+    else :
+        downplace(thejson,repo,branch,name,name+"/",progress,status)
+    progress.stop()
 if __name__ == "__main__":
     main()
 
