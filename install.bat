@@ -8,10 +8,10 @@ if errorlevel 1 (
 )
 pip install -r .\requirements.txt 
 
-echo Creating executable from %~1...
-pyinstaller --onefile --distpath dist %~1
+echo Creating executable from gitdown.py ...
+pyinstaller --onefile --distpath dist gitdown.py  
 
-set SCRIPT_NAME=%~n1
+set SCRIPT_NAME=gitdown.py 
 if not exist "dist\%SCRIPT_NAME%.exe" (
     echo Failed to create executable.
     exit /b 1
