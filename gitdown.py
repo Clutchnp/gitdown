@@ -19,7 +19,9 @@ def arghelper():
 def responder(url):
     piece = url.split("/")
     repo = f"{piece[3]}/{piece[4]}"
-    newurl = f"https://api.github.com/repos/{repo}/git/trees/{piece[6]}?recursive=1"
+    branch = piece[6]
+    newurl = f"https://api.github.com/repos/{repo}/git/trees/{branch}?recursive=1"
+    print(newurl)
     
     try:
         response = requests.get(newurl)
@@ -32,22 +34,31 @@ def responder(url):
     name = [x for x in piece if x][-1]
     path = '/'.join(piece[7:])
     
-    return jsonresponse, repo, path, piece[6], name
+    return jsonresponse, repo, path, branch, name
 
 def get_size(json):
     size = sum(x['size'] for x in json['tree'] if x['type'] == 'blob')
     return size
 
 def thejsonresponse(response, path):
-    for x in response['tree']:
-        if x['path'] == path:
-            try:
-                jsonresponse = requests.get(x['url'] + "?recursive=1")
-                jsonresponse.raise_for_status()
-                return jsonresponse.json()
-            except requests.exceptions.RequestException as e:
-                print(f"Error fetching file tree: {e}")
-                sys.exit(1)
+    if path == "":
+        try:
+            jsonresponse = requests.get(response['url'] + "?recursive=1")
+            jsonresponse.raise_for_status()
+            return jsonresponse.json()
+        except requests.exceptions.RequestException as e:
+            print(f"Error fetching file tree: {e}")
+            sys.exit(1)
+    else: 
+        for x in response['tree']:
+            if x['path'] == path:
+                try:
+                    jsonresponse = requests.get(x['url'] + "?recursive=1")
+                    jsonresponse.raise_for_status()
+                    return jsonresponse.json()
+                except requests.exceptions.RequestException as e:
+                    print(f"Error fetching file tree: {e}")
+                    sys.exit(1)
     return None
 
 def create_dir(path):

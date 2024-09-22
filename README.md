@@ -48,3 +48,6 @@ The commit `#932a6b` introduces a new way to handle API requests.
   - ```bash
     gitdown {link} {newname}
     ```
+# > [!NOTE]
+> this will also work for repos themselves provided the tree is provided for eg: "https://github.com/Clutchnp/myvim" **WON'T work** but "https://github.com/Clutchnp/myvim/tree/main" will 
+
