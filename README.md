@@ -1,6 +1,6 @@
 # GitDown CLI Tool
 
-This tool allows users to easily download specific directories from GitHub repositories using the command line.
+This tool allows users to easily download specific directories and files from GitHub repositories using the command line.
 
 ### Big Change
 The commit `#932a6b` introduces a new way to handle API requests. 
@@ -48,6 +48,10 @@ The commit `#932a6b` introduces a new way to handle API requests.
   - ```bash
     gitdown {link} {newname}
     ```
-# > [!NOTE]
+> [!NOTE]
 > this will also work for repos themselves provided the tree is provided for eg: "https://github.com/Clutchnp/myvim" **WON'T work** but "https://github.com/Clutchnp/myvim/tree/main" will 
+
+> [!NOTE]
+> Also Dowloading files dont use API requests so no fear of hitting rate limits  
+
 
