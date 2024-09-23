@@ -36,15 +36,15 @@ def file(repo,path,branch,name):
                     progress.update(status, advance=len(chunk))
 def responder(url):
     piece = url.split("/")
-    if len(piece) <= 6:
-        print("Pls specify the branch to download using 'tree/{branch}' after the url to download the REPO ITSELF if that's not the case check help page\nFor eg: To download 'https://github.com/Clutchnp/gitdown' type 'https://github.com/Clutchnp/gitdown/tree/main' for downloading the main branch ") 
-        sys.exit(1)
-
-    repo = f"{piece[3]}/{piece[4]}"
-    content_type = piece[5]
-    branch = piece[6]
-    name = [x for x in piece if x][-1]
-    path = '/'.join(piece[7:])
+    piece = [x for x in piece if x]
+    repo = f"{piece[2]}/{piece[3]}"
+    if len(piece) == 4:
+        print("Branch not provided, assuming main branch") 
+        piece += ['tree','main']
+    content_type = piece[4]
+    branch = piece[5]
+    name = piece[-1]
+    path = '/'.join(piece[6:])
     if content_type == "tree":
         newurl = f"https://api.github.com/repos/{repo}/git/trees/{branch}?recursive=1"
         try:
@@ -89,7 +89,7 @@ def create_dir(path):
     if path:
         os.makedirs(path, exist_ok=True)
 
-def downplace(json, repo, branch,path, newname, progress, status):
+def downplace(json, repo, branch,path,name, newname, progress, status):
     
     for x in json["tree"]:
         if x["type"] == "blob":
@@ -105,8 +105,9 @@ def downplace(json, repo, branch,path, newname, progress, status):
                 continue
             
             # Create the necessary directories
+            if newname == f'{name}/' and path =='':
+              newname = repo.split('/')[-1]+ '/'
             create_dir(newname + os.path.dirname(file_path))
-            
             # Write the file in chunks
             with open(newname + file_path, "wb") as f:
                 for chunk in r.iter_content(50000):  # Chunk size of 50000 bytes
@@ -131,9 +132,9 @@ def main():
         
         with progress:
             if arg['newname']:
-                downplace(thejson, repo, branch, path, arg['newname'] + "/", progress, status)
+                downplace(thejson, repo, branch, path,name, arg['newname'] + "/", progress, status)
             else:
-                downplace(thejson, repo, branch, path, name + "/", progress, status)
+                downplace(thejson, repo, branch, path,name, name + "/", progress, status)
     elif content_type == "blob":
         if arg['newname']:
             file(repo,path,branch,arg['newname'])

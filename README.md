@@ -49,7 +49,7 @@ The commit `#932a6b` introduces a new way to handle API requests.
     gitdown {link} {newname}
     ```
 > [!NOTE]
-> this will also work for repos themselves provided the tree is provided for eg: "https://github.com/Clutchnp/myvim" **WON'T work** but "https://github.com/Clutchnp/myvim/tree/main" will 
+> From commit #24e4056 if you dont specify branch name while downloading a whole repo then main branch is assumed also now the name is changed to the repo name if whole repo is downloaded
 
 > [!NOTE]
 > Also Dowloading files dont use API requests so no fear of hitting rate limits  
