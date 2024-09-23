@@ -49,7 +49,7 @@ The commit `#932a6b` introduces a new way to handle API requests.
     gitdown {link} {newname}
     ```
 > [!NOTE]
-> From commit #24e4056 if you dont specify branch name while downloading a whole repo then main branch is assumed also now the name is changed to the repo name if whole repo is downloaded
+> From commit [#24e4056 ](https://github.com/Clutchnp/gitdown/commit/c980d5c6fa2fb94b3e665b889245e37ee26db24f) if you dont specify branch name while downloading a whole repo then main branch is assumed also now the name is changed to the repo name if whole repo is downloaded
 
 > [!NOTE]
 > Also Dowloading files dont use API requests so no fear of hitting rate limits  
