@@ -36,6 +36,10 @@ def file(repo,path,branch,name):
                     progress.update(status, advance=len(chunk))
 def responder(url):
     piece = url.split("/")
+    if len(piece) <= 6:
+        print("Pls specify the branch to download using 'tree/{branch}' after the url to download the REPO ITSELF if that's not the case check help page\nFor eg: To download 'https://github.com/Clutchnp/gitdown' type 'https://github.com/Clutchnp/gitdown/tree/main' for downloading the main branch ") 
+        sys.exit(1)
+
     repo = f"{piece[3]}/{piece[4]}"
     content_type = piece[5]
     branch = piece[6]
