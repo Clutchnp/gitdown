@@ -1,6 +1,7 @@
 import requests
 import os
-import rich.progress
+from rich import print
+from rich import progress as rprogress
 import sys
 import argparse
 
@@ -25,7 +26,7 @@ def file(repo,path,branch,name):
         print(f"Error downloading file: {e}")
         sys.exit(1)
     
-    progress = rich.progress.Progress()
+    progress = rprogress.Progress()
     status = progress.add_task('Downloading', total=int(requests.get(download_url, stream=True).headers['Content-length']))
     with progress:
     # Write the file in chunks
@@ -39,7 +40,9 @@ def responder(url):
     piece = [x for x in piece if x]
     repo = f"{piece[2]}/{piece[3]}"
     if len(piece) == 4:
-        print("Branch not provided, assuming main branch") 
+       
+
+        print("[bold yellow]⚠️ Warning: Branch not provided, assuming main branch[/bold yellow]")
         piece += ['tree','main']
     content_type = piece[4]
     branch = piece[5]
@@ -127,7 +130,7 @@ def main():
         
         size = get_size(thejson)
         
-        progress = rich.progress.Progress()
+        progress = rprogress.Progress()
         status = progress.add_task('Downloading', total=size)
         
         with progress:
